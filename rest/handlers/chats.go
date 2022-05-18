@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strings"
 	"telegram_back/models"
 
@@ -35,6 +36,7 @@ func (h *handler) CreateChat(c *gin.Context) {
 		h.handleError(c, err)
 		return
 	}
+	message.UserID = c.GetString("user_id")
 
 	chatId, err := h.storage.CreateChat(c.Request.Context(), chatType, members, message)
 	if err != nil {
@@ -66,19 +68,19 @@ func (h *handler) GetChat(c *gin.Context) {
 	h.handleSuccess(c, chat)
 }
 
-// @Summary Get all chats
-// @Description Get all chats
+// @Summary Get all user chats
+// @Description Get all user chats
 // @Tags chats
 // @Accept  json
 // @Produce  json
 // @Security ApiKeyAuth
-// @Param user_id query string true "user_id"
 // @Success 200 {object} models.Response{data=[]models.Chat}
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Router /chats [get]
 func (h *handler) GetAllChats(c *gin.Context) {
-	userID := c.Query("user_id")
+	userID := c.GetString("user_id")
+	fmt.Println(c.GetString("user_id"))
 	var chats []models.Chat
 	if err := h.storage.GetAllChats(c.Request.Context(), userID, &chats); err != nil {
 		h.handleError(c, err)

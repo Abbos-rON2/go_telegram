@@ -34,7 +34,7 @@ func New(cfg config.Config, s handlers.UserI) (srv *http.Server) {
 	r.POST("/register", h.CreateUser)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	users := r.Group("/users")
+	users := r.Group("/users").Use(h.AuthMiddleware).Use(h.AuthMiddleware)
 	{
 		users.GET("/:id", h.GetUser)
 		users.GET("/phone/:phone", h.GetUserByPhone)
@@ -63,34 +63,32 @@ func New(cfg config.Config, s handlers.UserI) (srv *http.Server) {
 	// 	comments.POST("/", h.CreateComment)
 	// }
 
-	chats := r.Group("/chats")
+	chats := r.Group("/chats").Use(h.AuthMiddleware)
 	{
 		chats.POST("/", h.CreateChat)
 		chats.GET("/:id", h.GetChat)
+		chats.GET("/", h.GetAllChats)
 		// 	chats.GET("/:id/messages", h.GetChatMessages)
 		// 	chats.GET("/:id/users", h.GetChatUsers)
-		// 	chats.GET("/", h.GetAllChats)
 		// 	chats.POST("/:id/users/:user_id", h.AddUserToChat)
 	}
-	// messages := r.Group("/messages").Use(h.AuthMiddleware)
-	// {
-	// 	messages.POST("/", h.CreateMessage)
-	// 	messages.GET("/:id", h.GetMessage)
-	// 	messages.GET("/", h.GetAllMessages)
-	// 	messages.GET("/:id/chat", h.GetChat)
-	// }
+
+	messages := r.Group("/messages").Use(h.AuthMiddleware)
+	{
+		messages.POST("/", h.CreateMessage)
+		// 	messages.GET("/:id", h.GetMessage)
+		// 	messages.GET("/", h.GetAllMessages)
+		// 	messages.GET("/:id/chat", h.GetChat)
+	}
 
 	// subscriptions := r.Group("/subscriptions").Use(h.AuthMiddleware)
 	// {
 	// 	subscriptions.POST("/{target_id}", h.Subscribe)
 	// 	subscriptions.DELETE("/{target_id}", h.Unsubscribe)
-
 	// 	subscriptions.GET("/{user_id}/subscribers", h.GetSubscribers)
 	// 	subscriptions.GET("/{user_id}/subscribers_count", h.GetSubscribersCount)
-
 	// 	subscriptions.GET("/{user_id}/subscriptions", h.GetSubscriptions)
 	// 	subscriptions.GET("/{user_id}/subscriptions_count", h.GetSubscriptionsCount)
-
 	// }
 
 	srv = &http.Server{

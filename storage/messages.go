@@ -6,25 +6,25 @@ import (
 
 	"telegram_back/models"
 
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s *storage) CreateChat(ctx context.Context, chatType string, members []string, message models.CreateMessageRequest) (chatID string, err error) {
 	doc := models.Message{
-		ID:        uuid.NewString(),
 		Content:   message.Content,
 		UserID:    message.UserID,
 		CreatedAt: time.Now(),
 	}
+	members = append(members, message.UserID)
 
 	result, err := s.db.Collection("chats").InsertOne(ctx,
-		map[string]interface{}{
-			"members":  members,
-			"type":     chatType,
-			"messages": []models.Message{doc},
-		},
-	)
+		models.Chat{
+			Type:      chatType,
+			Members:   members,
+			Messages:  []models.Message{doc},
+			CreatedAt: time.Now().String(),
+		})
 	if err != nil {
 		return
 	}
@@ -34,18 +34,17 @@ func (s *storage) CreateChat(ctx context.Context, chatType string, members []str
 }
 
 func (s *storage) CreateMessage(ctx context.Context, message models.CreateMessageRequest) error {
+	obj, _ := primitive.ObjectIDFromHex(message.ChatID)
 	doc := models.Message{
 		Content:   message.Content,
 		UserID:    message.UserID,
 		CreatedAt: time.Now(),
 	}
+
 	_, err := s.db.Collection("chats").UpdateOne(ctx,
-		map[string]interface{}{"id": message.ChatID},
-		map[string]interface{}{
-			"$push": map[string]interface{}{
-				"messages": doc,
-			},
-		})
+		bson.M{"_id": obj},
+		bson.M{"$push": bson.M{"messages": doc}},
+	)
 	return err
 }
 

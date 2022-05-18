@@ -26,7 +26,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all chats",
+                "description": "Get all user chats",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,16 +36,7 @@ const docTemplate = `{
                 "tags": [
                     "chats"
                 ],
-                "summary": "Get all chats",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user_id",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "Get all user chats",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -568,23 +559,26 @@ const docTemplate = `{
         "models.Chat": {
             "type": "object",
             "properties": {
-                "content": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Message"
-                    }
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "user_id": {
+                "members": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Message"
+                    }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -595,9 +589,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "content": {
-                    "type": "string"
-                },
-                "user_id": {
                     "type": "string"
                 }
             }

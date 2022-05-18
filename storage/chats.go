@@ -33,7 +33,7 @@ func (s *storage) GetChat(ctx context.Context, chatID string, chat *models.Chat)
 func (s *storage) GetAllChats(ctx context.Context, userID string, chats *[]models.Chat) error {
 	cursor, err := s.db.Collection("chats").Find(ctx, map[string]interface{}{
 		"type": "direct",
-		"members": map[string]interface{}{
+		"members": bson.M{
 			"$in": []string{userID},
 		},
 	})

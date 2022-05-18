@@ -2,26 +2,26 @@ basePath: /
 definitions:
   models.Chat:
     properties:
-      content:
-        items:
-          $ref: '#/definitions/models.Message'
-        type: array
       created_at:
         type: string
       id:
         type: string
-      user_id:
+      members:
         items:
           type: string
         type: array
+      messages:
+        items:
+          $ref: '#/definitions/models.Message'
+        type: array
+      type:
+        type: string
     type: object
   models.CreateMessageRequest:
     properties:
       chat_id:
         type: string
       content:
-        type: string
-      user_id:
         type: string
     type: object
   models.CreateUserRequest:
@@ -106,13 +106,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all chats
-      parameters:
-      - description: user_id
-        in: query
-        name: user_id
-        required: true
-        type: string
+      description: Get all user chats
       produces:
       - application/json
       responses:
@@ -137,7 +131,7 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: Get all chats
+      summary: Get all user chats
       tags:
       - chats
     post:

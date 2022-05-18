@@ -29,6 +29,7 @@ func (h *handler) CreateMessage(c *gin.Context) {
 		h.handleError(c, err)
 		return
 	}
+	message.UserID = c.GetString("user_id")
 
 	if err := h.storage.CreateMessage(c.Request.Context(), message); err != nil {
 		h.handleError(c, err)
